@@ -86,6 +86,7 @@ namespace AgDatabaseMove.Unit
 
     private static List<BackupMetadata> GetBackupListWithoutLogs()
     {
+
       var list = GetBackupList();
       list.RemoveAll(b => b.BackupType == BackupFileTools.BackupType.Log);
       return list;
@@ -128,7 +129,6 @@ namespace AgDatabaseMove.Unit
     private static void VerifyListIsAValidBackupChain(IEnumerable<BackupMetadata> backupChain)
     {
       var backupChainList = backupChain.ToList();
-
       var listOfFileNames = backupChainList.Select(b => b.PhysicalDeviceName).ToList();
       Assert.True(listOfFileNames.Count == listOfFileNames.Distinct().Count());
 
@@ -194,7 +194,7 @@ namespace AgDatabaseMove.Unit
     public void BackupChainIsCorrect(List<BackupMetadata> backupList)
     {
       var agDatabase = new Mock<IAgDatabase>();
-      agDatabase.Setup(agd => agd.RecentBackups()).Returns(backupList);
+      agDatabase.Setup(agd => agd.RecentBackups(false)).Returns(backupList);
       var backupChain = new BackupChain(agDatabase.Object);
       VerifyListIsAValidBackupChain(backupChain.OrderedBackups);
     }
@@ -210,7 +210,7 @@ namespace AgDatabaseMove.Unit
     public void CanDetectBackupChainIsWrong(List<BackupMetadata> backupList)
     {
       var agDatabase = new Mock<IAgDatabase>();
-      agDatabase.Setup(agd => agd.RecentBackups()).Returns(backupList);
+      agDatabase.Setup(agd => agd.RecentBackups(false)).Returns(backupList);
       Assert.Throws<BackupChainException>(() => new BackupChain(agDatabase.Object));
     }
 
